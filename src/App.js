@@ -23,6 +23,124 @@ const loadshedding = { stage:2, next:"18:00 – 20:30", area:"Ladysmith North", 
 const statusColor = { open:"#ef4444","in-progress":"#f59e0b", resolved:"#22c55e" };
 const statusLabel = { open:"Open","in-progress":"In Progress", resolved:"Resolved" };
 
+// Ward-level data — each ward has its own service statuses and reports
+const wardData = {
+  "All Wards": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"warning",  reports:43, lastUpdate:"2h ago"  },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"critical", reports:91, lastUpdate:"30m ago" },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"warning",  reports:67, lastUpdate:"1h ago"  },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"good",     reports:12, lastUpdate:"4h ago"  },
+    ],
+    reports: [
+      { id:1, type:"Water",       location:"Murchison St, Ward 3",    time:"12 min ago", status:"open",        desc:"Main pipe burst near intersection" },
+      { id:2, type:"Electricity", location:"Lyell St, Ward 5",        time:"34 min ago", status:"in-progress", desc:"No power since last night" },
+      { id:3, type:"Roads",       location:"Keate St, Ward 2",        time:"1h ago",     status:"open",        desc:"Large pothole damaging vehicles" },
+      { id:4, type:"Waste",       location:"Alexandra Rd, Ward 7",    time:"3h ago",     status:"resolved",    desc:"Missed collection for 2 weeks" },
+      { id:5, type:"Water",       location:"Pietermaritz St, Ward 1", time:"5h ago",     status:"in-progress", desc:"Low water pressure reported" },
+    ],
+  },
+  "Ward 1": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"good",     reports:3,  lastUpdate:"6h ago"  },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"warning",  reports:8,  lastUpdate:"1h ago"  },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"warning",  reports:11, lastUpdate:"3h ago"  },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"good",     reports:2,  lastUpdate:"5h ago"  },
+    ],
+    reports: [
+      { id:5, type:"Water",       location:"Pietermaritz St, Ward 1", time:"5h ago",  status:"in-progress", desc:"Low water pressure reported" },
+      { id:6, type:"Roads",       location:"Burger St, Ward 1",       time:"8h ago",  status:"open",        desc:"Pothole causing tyre damage" },
+    ],
+  },
+  "Ward 2": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"warning",  reports:9,  lastUpdate:"2h ago"  },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"good",     reports:4,  lastUpdate:"4h ago"  },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"critical", reports:22, lastUpdate:"30m ago" },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"warning",  reports:6,  lastUpdate:"2h ago"  },
+    ],
+    reports: [
+      { id:3, type:"Roads",       location:"Keate St, Ward 2",        time:"1h ago",  status:"open",        desc:"Large pothole damaging vehicles" },
+      { id:7, type:"Electricity", location:"Forbes St, Ward 2",       time:"2h ago",  status:"open",        desc:"Street lights out for 3 days" },
+      { id:8, type:"Roads",       location:"Murchison St, Ward 2",    time:"3h ago",  status:"in-progress", desc:"Road surface crumbling" },
+    ],
+  },
+  "Ward 3": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"warning",  reports:14, lastUpdate:"1h ago"  },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"critical", reports:41, lastUpdate:"10m ago" },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"warning",  reports:18, lastUpdate:"2h ago"  },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"good",     reports:3,  lastUpdate:"6h ago"  },
+    ],
+    reports: [
+      { id:1,  type:"Water",       location:"Murchison St, Ward 3",   time:"12 min ago", status:"open",        desc:"Main pipe burst near intersection" },
+      { id:9,  type:"Water",       location:"Queen St, Ward 3",       time:"1h ago",     status:"in-progress", desc:"No running water since yesterday" },
+      { id:10, type:"Electricity", location:"Alfred St, Ward 3",      time:"2h ago",     status:"open",        desc:"Transformer fault reported" },
+    ],
+  },
+  "Ward 4": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"good",    reports:5,  lastUpdate:"5h ago" },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"good",    reports:3,  lastUpdate:"4h ago" },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"warning", reports:9,  lastUpdate:"3h ago" },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"good",    reports:1,  lastUpdate:"7h ago" },
+    ],
+    reports: [
+      { id:11, type:"Roads", location:"Victoria St, Ward 4", time:"3h ago", status:"open",     desc:"Speed bump collapsed" },
+      { id:12, type:"Roads", location:"Hyde Rd, Ward 4",     time:"5h ago", status:"resolved", desc:"Pothole filled — confirmed" },
+    ],
+  },
+  "Ward 5": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"critical", reports:21, lastUpdate:"20m ago" },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"warning",  reports:12, lastUpdate:"1h ago"  },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"good",     reports:4,  lastUpdate:"6h ago"  },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"warning",  reports:7,  lastUpdate:"2h ago"  },
+    ],
+    reports: [
+      { id:2,  type:"Electricity", location:"Lyell St, Ward 5",      time:"34 min ago", status:"in-progress", desc:"No power since last night" },
+      { id:13, type:"Electricity", location:"Cleg St, Ward 5",       time:"1h ago",     status:"open",        desc:"Whole street without electricity" },
+      { id:14, type:"Water",       location:"Murchison St, Ward 5",  time:"2h ago",     status:"open",        desc:"Discoloured water from taps" },
+    ],
+  },
+  "Ward 6": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"good",    reports:2,  lastUpdate:"8h ago" },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"good",    reports:3,  lastUpdate:"6h ago" },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"good",    reports:2,  lastUpdate:"7h ago" },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"warning", reports:4,  lastUpdate:"3h ago" },
+    ],
+    reports: [
+      { id:15, type:"Waste", location:"Raaff St, Ward 6",  time:"3h ago", status:"open", desc:"Missed bin collection this week" },
+    ],
+  },
+  "Ward 7": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"good",    reports:4,  lastUpdate:"4h ago" },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"warning", reports:10, lastUpdate:"2h ago" },
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"good",    reports:5,  lastUpdate:"5h ago" },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"warning", reports:6,  lastUpdate:"1h ago" },
+    ],
+    reports: [
+      { id:4,  type:"Waste", location:"Alexandra Rd, Ward 7",  time:"3h ago", status:"resolved",    desc:"Missed collection for 2 weeks" },
+      { id:16, type:"Water", location:"Harrismith Rd, Ward 7", time:"2h ago", status:"in-progress", desc:"Water meter leaking on pavement" },
+    ],
+  },
+  "Ward 8": {
+    services: [
+      { id:"electricity", icon:"⚡", label:"Electricity",        status:"warning",  reports:8,  lastUpdate:"3h ago" },
+      { id:"water",       icon:"💧", label:"Water & Sanitation", status:"critical", reports:18, lastUpdate:"45m ago"},
+      { id:"roads",       icon:"🛣️", label:"Roads & Potholes",   status:"warning",  reports:11, lastUpdate:"2h ago" },
+      { id:"waste",       icon:"🗑️", label:"Waste Collection",   status:"good",     reports:3,  lastUpdate:"6h ago" },
+    ],
+    reports: [
+      { id:17, type:"Water",       location:"Helpmekaar Rd, Ward 8", time:"45m ago", status:"open",        desc:"Burst main pipe flooding road" },
+      { id:18, type:"Electricity", location:"Bloukrans St, Ward 8",  time:"3h ago",  status:"in-progress", desc:"Intermittent power cuts" },
+      { id:19, type:"Roads",       location:"Wasbank Rd, Ward 8",    time:"2h ago",  status:"open",        desc:"Large sinkhole forming" },
+    ],
+  },
+};
+
 export default function ServicePulse() {
   const [view,        setView]        = useState("resident");
   const [activeTab,   setActiveTab]   = useState("dashboard");
@@ -31,6 +149,7 @@ export default function ServicePulse() {
   const [submitted,   setSubmitted]   = useState(false);
   const [photos,      setPhotos]      = useState([]);
   const [isMobile,    setIsMobile]    = useState(window.innerWidth < 768);
+  const [selectedWard, setSelectedWard] = useState("All Wards");
 
   useEffect(() => {
     const handler = () => setIsMobile(window.innerWidth < 768);
@@ -174,90 +293,173 @@ export default function ServicePulse() {
         <main style={{ flex:1, padding: isMobile ? "16px 14px" : "24px", overflowY:"auto" }}>
 
           {/* ════ DASHBOARD ════ */}
-          {activeTab === "dashboard" && (
-            <div>
-              <div style={{ marginBottom:20 }}>
-                <h1 style={{ fontSize: isMobile ? 18 : 22, fontWeight:700, color:"#f1f5f9", margin:0 }}>Service Status</h1>
-                <p style={{ fontSize:12, color:"#64748b", margin:"4px 0 0" }}>
-                  Real-time delivery status · Alfred Duma Municipality
-                </p>
-              </div>
-
-              {/* service cards — 1 col mobile, 2 col desktop */}
-              <div style={{
-                display:"grid",
-                gridTemplateColumns: isMobile ? "1fr 1fr" : "1fr 1fr",
-                gap: isMobile ? 10 : 16, marginBottom:24,
-              }}>
-                {services.map(svc => {
-                  const s = STATUS[svc.status];
-                  return (
-                    <div key={svc.id} style={{
-                      background:s.bg, border:`1px solid ${s.color}30`,
-                      borderRadius:12, padding: isMobile ? "14px" : "18px 20px",
-                    }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
-                        <div>
-                          <span style={{ fontSize: isMobile ? 22 : 26 }}>{svc.icon}</span>
-                          <div style={{ fontSize: isMobile ? 12 : 14, fontWeight:600, color:"#e2e8f0", marginTop:6 }}>{svc.label}</div>
-                          {!isMobile && <div style={{ fontSize:11, color:"#64748b", marginTop:2, fontFamily:"monospace" }}>Updated {svc.lastUpdate}</div>}
-                        </div>
-                        <div style={{ textAlign:"right" }}>
-                          <div style={{
-                            display:"inline-flex", alignItems:"center", gap:4,
-                            background:`${s.color}20`, border:`1px solid ${s.color}40`,
-                            borderRadius:20, padding:"2px 8px",
-                          }}>
-                            <span style={{ width:5, height:5, borderRadius:"50%", background:s.color, display:"inline-block" }}></span>
-                            <span style={{ fontSize:10, color:s.color, fontWeight:600 }}>{s.label}</span>
-                          </div>
-                          <div style={{ fontSize: isMobile ? 20 : 24, fontWeight:700, color:s.color, marginTop:8 }}>{svc.reports}</div>
-                          <div style={{ fontSize:10, color:"#64748b" }}>reports</div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* recent reports */}
-              <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
-                <h2 style={{ fontSize:12, fontWeight:600, color:"#94a3b8", margin:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>
-                  Recent Reports
-                </h2>
-                <span style={{ fontSize:11, color:"#3b82f6", cursor:"pointer" }}>View all →</span>
-              </div>
-              <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
-                {recentReports.map(r => (
-                  <div key={r.id} style={{ ...card, padding:"12px 14px", display:"flex", gap:12, alignItems:"flex-start" }}>
-                    <div style={{
-                      width:34, height:34, borderRadius:8, background:"#1e293b",
-                      display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0,
-                    }}>
-                      {services.find(s => s.label.includes(r.type))?.icon || "📋"}
-                    </div>
-                    <div style={{ flex:1, minWidth:0 }}>
-                      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:4 }}>
-                        <div>
-                          <span style={{ fontSize:13, fontWeight:600, color:"#e2e8f0" }}>{r.type}</span>
-                          <span style={{ fontSize:11, color:"#64748b", marginLeft:8 }}>{r.location}</span>
-                        </div>
-                        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
-                          <span style={{
-                            fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:20,
-                            background:`${statusColor[r.status]}20`, color:statusColor[r.status],
-                            border:`1px solid ${statusColor[r.status]}40`, whiteSpace:"nowrap",
-                          }}>{statusLabel[r.status]}</span>
-                          {!isMobile && <span style={{ fontSize:11, color:"#475569", fontFamily:"monospace" }}>{r.time}</span>}
-                        </div>
-                      </div>
-                      <div style={{ fontSize:12, color:"#64748b", marginTop:4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace: isMobile ? "nowrap" : "normal" }}>{r.desc}</div>
-                    </div>
+          {activeTab === "dashboard" && (() => {
+            const wData = wardData[selectedWard];
+            const wardServices = wData.services;
+            const wardReports  = wData.reports;
+            const totalReports = wardServices.reduce((a,s) => a + s.reports, 0);
+            const criticalCount = wardServices.filter(s => s.status === "critical").length;
+            return (
+              <div>
+                {/* title row */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:16, flexWrap:"wrap", gap:10 }}>
+                  <div>
+                    <h1 style={{ fontSize: isMobile ? 18 : 22, fontWeight:700, color:"#f1f5f9", margin:0 }}>Service Status</h1>
+                    <p style={{ fontSize:12, color:"#64748b", margin:"4px 0 0" }}>
+                      Real-time delivery · Alfred Duma Municipality
+                    </p>
                   </div>
-                ))}
+                  {/* ward summary badge */}
+                  {selectedWard !== "All Wards" && (
+                    <div style={{ display:"flex", gap:10 }}>
+                      <div style={{ background:"#0f172a", border:"1px solid #1e293b", borderRadius:8, padding:"8px 14px", textAlign:"center" }}>
+                        <div style={{ fontSize:18, fontWeight:700, color:"#f1f5f9" }}>{totalReports}</div>
+                        <div style={{ fontSize:10, color:"#64748b" }}>total reports</div>
+                      </div>
+                      <div style={{ background: criticalCount > 0 ? "#1c0a0a" : "#052e16", border:`1px solid ${criticalCount > 0 ? "#ef444440" : "#22c55e40"}`, borderRadius:8, padding:"8px 14px", textAlign:"center" }}>
+                        <div style={{ fontSize:18, fontWeight:700, color: criticalCount > 0 ? "#ef4444" : "#22c55e" }}>{criticalCount}</div>
+                        <div style={{ fontSize:10, color:"#64748b" }}>critical</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* ── WARD FILTER DROPDOWN ── */}
+                <div style={{ marginBottom:20 }}>
+                  <label style={{ fontSize:11, color:"#64748b", textTransform:"uppercase", letterSpacing:"0.08em", display:"block", marginBottom:6 }}>
+                    📍 Filter by Ward
+                  </label>
+                  <div style={{ position:"relative", display:"inline-block", width:"100%", maxWidth: isMobile ? "100%" : 260 }}>
+                    <select
+                      value={selectedWard}
+                      onChange={e => setSelectedWard(e.target.value)}
+                      style={{
+                        width:"100%",
+                        padding: isMobile ? "10px 36px 10px 14px" : "10px 36px 10px 14px",
+                        background:"#0f172a",
+                        border:`1px solid ${selectedWard !== "All Wards" ? "#3b82f6" : "#1e293b"}`,
+                        borderRadius:8,
+                        color: selectedWard !== "All Wards" ? "#93c5fd" : "#e2e8f0",
+                        fontSize:13, fontWeight:600,
+                        cursor:"pointer", outline:"none",
+                        appearance:"none", WebkitAppearance:"none",
+                        boxShadow: selectedWard !== "All Wards" ? "0 0 0 1px #3b82f630" : "none",
+                      }}
+                    >
+                      <option value="All Wards">All Wards — Overview</option>
+                      {WARDS.map(w => (
+                        <option key={w} value={w}>{w} — Alfred Duma</option>
+                      ))}
+                    </select>
+                    {/* custom chevron */}
+                    <div style={{
+                      position:"absolute", right:12, top:"50%", transform:"translateY(-50%)",
+                      pointerEvents:"none", color: selectedWard !== "All Wards" ? "#3b82f6" : "#64748b",
+                      fontSize:12,
+                    }}>▼</div>
+                  </div>
+                </div>
+
+                {/* ward status indicator */}
+                {selectedWard !== "All Wards" && (
+                  <div style={{
+                    background:"#0f172a", border:"1px solid #1e293b", borderRadius:10,
+                    padding:"10px 14px", marginBottom:16,
+                    display:"flex", alignItems:"center", gap:10,
+                  }}>
+                    <span style={{ fontSize:16 }}>📍</span>
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:600, color:"#e2e8f0" }}>{selectedWard}</div>
+                      <div style={{ fontSize:11, color:"#64748b" }}>Alfred Duma Local Municipality · KwaZulu-Natal</div>
+                    </div>
+                    <button onClick={() => setSelectedWard("All Wards")} style={{
+                      marginLeft:"auto", fontSize:11, color:"#475569", background:"none",
+                      border:"1px solid #1e293b", borderRadius:6, padding:"4px 10px", cursor:"pointer",
+                    }}>← All Wards</button>
+                  </div>
+                )}
+
+                {/* service cards */}
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: isMobile ? 10 : 16, marginBottom:24 }}>
+                  {wardServices.map(svc => {
+                    const s = STATUS[svc.status];
+                    return (
+                      <div key={svc.id} style={{
+                        background:s.bg, border:`1px solid ${s.color}30`,
+                        borderRadius:12, padding: isMobile ? "14px" : "18px 20px",
+                      }}>
+                        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                          <div>
+                            <span style={{ fontSize: isMobile ? 22 : 26 }}>{svc.icon}</span>
+                            <div style={{ fontSize: isMobile ? 12 : 14, fontWeight:600, color:"#e2e8f0", marginTop:6 }}>{svc.label}</div>
+                            {!isMobile && <div style={{ fontSize:11, color:"#64748b", marginTop:2, fontFamily:"monospace" }}>Updated {svc.lastUpdate}</div>}
+                          </div>
+                          <div style={{ textAlign:"right" }}>
+                            <div style={{
+                              display:"inline-flex", alignItems:"center", gap:4,
+                              background:`${s.color}20`, border:`1px solid ${s.color}40`,
+                              borderRadius:20, padding:"2px 8px",
+                            }}>
+                              <span style={{ width:5, height:5, borderRadius:"50%", background:s.color, display:"inline-block" }}></span>
+                              <span style={{ fontSize:10, color:s.color, fontWeight:600 }}>{s.label}</span>
+                            </div>
+                            <div style={{ fontSize: isMobile ? 20 : 24, fontWeight:700, color:s.color, marginTop:8 }}>{svc.reports}</div>
+                            <div style={{ fontSize:10, color:"#64748b" }}>reports</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* recent reports */}
+                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:12 }}>
+                  <h2 style={{ fontSize:12, fontWeight:600, color:"#94a3b8", margin:0, letterSpacing:"0.06em", textTransform:"uppercase" }}>
+                    {selectedWard === "All Wards" ? "Recent Reports" : `Reports · ${selectedWard}`}
+                  </h2>
+                  <span style={{ fontSize:11, color:"#3b82f6" }}>{wardReports.length} report{wardReports.length !== 1 ? "s" : ""}</span>
+                </div>
+
+                {wardReports.length === 0 ? (
+                  <div style={{ ...card, textAlign:"center", padding:32 }}>
+                    <div style={{ fontSize:32, marginBottom:10 }}>✅</div>
+                    <div style={{ fontSize:14, fontWeight:600, color:"#4ade80" }}>No active reports</div>
+                    <div style={{ fontSize:12, color:"#64748b", marginTop:4 }}>{selectedWard} is all clear.</div>
+                  </div>
+                ) : (
+                  <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                    {wardReports.map(r => (
+                      <div key={r.id} style={{ ...card, padding:"12px 14px", display:"flex", gap:12, alignItems:"flex-start" }}>
+                        <div style={{
+                          width:34, height:34, borderRadius:8, background:"#1e293b",
+                          display:"flex", alignItems:"center", justifyContent:"center", fontSize:16, flexShrink:0,
+                        }}>
+                          {wardServices.find(s => s.label.includes(r.type))?.icon || "📋"}
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", flexWrap:"wrap", gap:4 }}>
+                            <div>
+                              <span style={{ fontSize:13, fontWeight:600, color:"#e2e8f0" }}>{r.type}</span>
+                              <span style={{ fontSize:11, color:"#64748b", marginLeft:8 }}>{r.location}</span>
+                            </div>
+                            <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+                              <span style={{
+                                fontSize:10, fontWeight:700, padding:"2px 7px", borderRadius:20,
+                                background:`${statusColor[r.status]}20`, color:statusColor[r.status],
+                                border:`1px solid ${statusColor[r.status]}40`, whiteSpace:"nowrap",
+                              }}>{statusLabel[r.status]}</span>
+                              {!isMobile && <span style={{ fontSize:11, color:"#475569", fontFamily:"monospace" }}>{r.time}</span>}
+                            </div>
+                          </div>
+                          <div style={{ fontSize:12, color:"#64748b", marginTop:4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace: isMobile ? "nowrap" : "normal" }}>{r.desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ════ REPORT ISSUE ════ */}
           {activeTab === "report" && (
