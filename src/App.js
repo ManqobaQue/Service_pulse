@@ -32,7 +32,7 @@ export default function ServicePulse() {
   const [view, setView] = useState("resident");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [reportStep, setReportStep] = useState(1);
-  const [reportData, setReportData] = useState({ type: "", ward: "", desc: "" });
+  const [reportData, setReportData] = useState({ type: "", name: "", phone: "", ward: "", location: "", desc: "" });
   const [submitted, setSubmitted] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
   const [photos, setPhotos] = useState([]);
@@ -52,11 +52,11 @@ export default function ServicePulse() {
   };
 
   const handleSubmit = () => {
-    if (reportData.type && reportData.ward && reportData.desc) {
+    if (reportData.type && reportData.name && reportData.phone && reportData.ward && reportData.desc) {
       setSubmitted(true);
       setTimeout(() => {
         setSubmitted(false); setReportStep(1);
-        setReportData({ type: "", ward: "", desc: "" });
+        setReportData({ type: "", name: "", phone: "", ward: "", location: "", desc: "" });
         setPhotos([]);
         setActiveTab("dashboard");
       }, 3000);
@@ -282,7 +282,7 @@ export default function ServicePulse() {
                 <div>
                   {/* Progress */}
                   <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
-                    {[1, 2, 3, 4].map(step => (
+                    {[1, 2, 3, 4, 5].map(step => (
                       <div key={step} style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <div style={{
                           width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center",
@@ -291,11 +291,11 @@ export default function ServicePulse() {
                           color: reportStep >= step ? "#fff" : "#475569",
                           border: `2px solid ${reportStep >= step ? "#3b82f6" : "#1e293b"}`
                         }}>{step}</div>
-                        {step < 4 && <div style={{ width: 28, height: 2, background: reportStep > step ? "#1d4ed8" : "#1e293b" }}></div>}
+                        {step < 5 && <div style={{ width: 28, height: 2, background: reportStep > step ? "#1d4ed8" : "#1e293b" }}></div>}
                       </div>
                     ))}
                     <div style={{ marginLeft: 8, fontSize: 12, color: "#64748b", alignSelf: "center" }}>
-                      {["Select Type", "Add Details", "Add Photos", "Confirm"][reportStep - 1]}
+                      {["Select Type", "Your Details", "Issue Details", "Add Photos", "Confirm"][reportStep - 1]}
                     </div>
                   </div>
 
@@ -319,8 +319,55 @@ export default function ServicePulse() {
                     </div>
                   )}
 
-                  {/* Step 2 */}
+                  {/* Step 2 — Resident Details */}
                   {reportStep === 2 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                      <div>
+                        <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Full Name</label>
+                        <input 
+                          type="text"
+                          placeholder="e.g. John Dlamini"
+                          value={reportData.name}
+                          onChange={e => setReportData({ ...reportData, name: e.target.value })}
+                          style={{
+                            width: "100%", padding: "10px 14px", background: "#0f172a",
+                            border: "1px solid #1e293b", borderRadius: 8, color: "#e2e8f0",
+                            fontSize: 13, outline: "none", boxSizing: "border-box"
+                          }} 
+                        />
+                      </div>
+                      <div>
+                        <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Cell Phone Number</label>
+                        <input 
+                          type="tel"
+                          placeholder="e.g. 0781234567"
+                          value={reportData.phone}
+                          onChange={e => setReportData({ ...reportData, phone: e.target.value })}
+                          style={{
+                            width: "100%", padding: "10px 14px", background: "#0f172a",
+                            border: "1px solid #1e293b", borderRadius: 8, color: "#e2e8f0",
+                            fontSize: 13, outline: "none", boxSizing: "border-box"
+                          }} 
+                        />
+                      </div>
+                      <div style={{ fontSize: 11, color: "#475569", padding: "10px", background: "#0f172a", borderRadius: 8, borderLeft: "3px solid #3b82f6" }}>
+                        ℹ️ We'll use this to update you on your report status
+                      </div>
+                      <div style={{ display: "flex", gap: 10 }}>
+                        <button onClick={() => setReportStep(1)} style={{
+                          flex: 1, padding: "11px", background: "#1e293b", border: "none",
+                          borderRadius: 8, color: "#94a3b8", fontSize: 13, cursor: "pointer"
+                        }}>← Back</button>
+                        <button onClick={() => reportData.name && reportData.phone && setReportStep(3)} style={{
+                          flex: 2, padding: "11px", background: "#1d4ed8", border: "none",
+                          borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer"
+                        }}>Continue →</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3 — Issue Details */}
+                  {reportStep === 3 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                       <div>
                         <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Select your ward</label>
@@ -336,12 +383,17 @@ export default function ServicePulse() {
                       </div>
                       <div>
                         <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Street / Location</label>
-                        <input placeholder="e.g. Corner of Murchison & Lyell St"
+                        <input 
+                          type="text"
+                          placeholder="e.g. Corner of Murchison & Lyell St"
+                          value={reportData.location}
+                          onChange={e => setReportData({ ...reportData, location: e.target.value })}
                           style={{
                             width: "100%", padding: "10px 14px", background: "#0f172a",
                             border: "1px solid #1e293b", borderRadius: 8, color: "#e2e8f0",
                             fontSize: 13, outline: "none", boxSizing: "border-box"
-                          }} />
+                          }} 
+                        />
                       </div>
                       <div>
                         <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 8 }}>Describe the problem</label>
@@ -355,11 +407,11 @@ export default function ServicePulse() {
                           }} />
                       </div>
                       <div style={{ display: "flex", gap: 10 }}>
-                        <button onClick={() => setReportStep(1)} style={{
+                        <button onClick={() => setReportStep(2)} style={{
                           flex: 1, padding: "11px", background: "#1e293b", border: "none",
                           borderRadius: 8, color: "#94a3b8", fontSize: 13, cursor: "pointer"
                         }}>← Back</button>
-                        <button onClick={() => reportData.ward && reportData.desc && setReportStep(3)} style={{
+                        <button onClick={() => reportData.ward && reportData.desc && setReportStep(4)} style={{
                           flex: 2, padding: "11px", background: "#1d4ed8", border: "none",
                           borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer"
                         }}>Continue →</button>
@@ -367,8 +419,8 @@ export default function ServicePulse() {
                     </div>
                   )}
 
-                  {/* Step 3 — Photos */}
-                  {reportStep === 3 && (
+                  {/* Step 4 — Photos */}
+                  {reportStep === 4 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
                       <div>
                         <label style={{ fontSize: 13, color: "#94a3b8", display: "block", marginBottom: 4 }}>Add Photos <span style={{ color: "#475569" }}>(optional — up to 3)</span></label>
@@ -422,11 +474,11 @@ export default function ServicePulse() {
                       </div>
 
                       <div style={{ display: "flex", gap: 10 }}>
-                        <button onClick={() => setReportStep(2)} style={{
+                        <button onClick={() => setReportStep(3)} style={{
                           flex: 1, padding: "11px", background: "#1e293b", border: "none",
                           borderRadius: 8, color: "#94a3b8", fontSize: 13, cursor: "pointer"
                         }}>← Back</button>
-                        <button onClick={() => setReportStep(4)} style={{
+                        <button onClick={() => setReportStep(5)} style={{
                           flex: 2, padding: "11px", background: "#1d4ed8", border: "none",
                           borderRadius: 8, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer"
                         }}>{photos.length > 0 ? `Continue with ${photos.length} photo${photos.length > 1 ? "s" : ""} →` : "Skip & Continue →"}</button>
@@ -434,19 +486,22 @@ export default function ServicePulse() {
                     </div>
                   )}
 
-                  {/* Step 4 — Confirm */}
-                  {reportStep === 4 && (
+                  {/* Step 5 — Confirm */}
+                  {reportStep === 5 && (
                     <div>
                       <div style={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 12, padding: 20, marginBottom: 20 }}>
                         <div style={{ fontSize: 13, color: "#64748b", marginBottom: 14, textTransform: "uppercase", letterSpacing: "0.08em" }}>Review your report</div>
                         {[
                           { label: "Type", value: services.find(s => s.id === reportData.type)?.label },
+                          { label: "Name", value: reportData.name },
+                          { label: "Phone", value: reportData.phone },
                           { label: "Ward", value: reportData.ward },
+                          { label: "Location", value: reportData.location },
                           { label: "Description", value: reportData.desc },
                           { label: "Photos", value: photos.length > 0 ? `${photos.length} photo${photos.length > 1 ? "s" : ""} attached` : "None" },
                         ].map(f => (
                           <div key={f.label} style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-                            <span style={{ fontSize: 12, color: "#475569", width: 80, flexShrink: 0 }}>{f.label}</span>
+                            <span style={{ fontSize: 12, color: "#475569", width: 100, flexShrink: 0 }}>{f.label}</span>
                             <span style={{ fontSize: 13, color: "#e2e8f0" }}>{f.value}</span>
                           </div>
                         ))}
@@ -459,7 +514,7 @@ export default function ServicePulse() {
                         )}
                       </div>
                       <div style={{ display: "flex", gap: 10 }}>
-                        <button onClick={() => setReportStep(3)} style={{
+                        <button onClick={() => setReportStep(4)} style={{
                           flex: 1, padding: "11px", background: "#1e293b", border: "none",
                           borderRadius: 8, color: "#94a3b8", fontSize: 13, cursor: "pointer"
                         }}>← Back</button>
